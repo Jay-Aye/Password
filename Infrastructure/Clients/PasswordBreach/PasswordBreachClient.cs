@@ -29,7 +29,14 @@ namespace Infrastructure.Clients.PasswordBreach
             var responseData = await response.Content.ReadAsByteArrayAsync().ConfigureAwait(false);
             var responseString = Encoding.UTF8.GetString(responseData, 0, responseData.Length);
             var result = responseString.Split(new string[] { System.Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
-            var breachCountString = result.Single(x => x.StartsWith(matchHash)).Split(':').Last();
+            var breachCountMatch = result.FirstOrDefault(x => x.StartsWith(requestHash));
+
+            if (breachCountMatch == null)
+            {
+                return 0;
+            }
+
+            var breachCountString = breachCountMatch.Split(':').Last();
 
             return int.Parse(breachCountString);
         }
